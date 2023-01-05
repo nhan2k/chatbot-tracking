@@ -108,6 +108,10 @@ function callSendAPI(senderPsid, response) {
     },
     message: response,
   };
+  console.log(
+    '🚀 ~ file: index.js:111 ~ callSendAPI ~ requestBody',
+    JSON.stringify(requestBody, null, 4)
+  );
 
   // Send the HTTP request to the Messenger Platform
   axios
