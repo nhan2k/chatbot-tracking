@@ -141,13 +141,13 @@ async function handleMessage(senderPsid, receivedMessage) {
         };
       } else {
         response = {
-          text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}. Nhập mã đơn hàng để xem tình trạng đơn hàng khác.`,
+          text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}. Nhập mã vận đơn để xem tình trạng đơn hàng khác.`,
         };
       }
     } catch (error) {
       console.log(error);
       response = {
-        text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}. Nhập mã đơn hàng để xem tình trạng đơn hàng khác.`,
+        text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}. Nhập mã vận đơn để xem tình trạng đơn hàng khác.`,
       };
     }
   } else if (receivedMessage.attachments) {
@@ -199,10 +199,10 @@ function handlePostback(senderPsid, receivedPostback) {
   } else if (payload === 'no') {
     response = { text: 'Oops, try sending another image.' };
   } else if (payload === 'TRACKING') {
-    response = { text: 'Nhập mã Tracking' };
+    response = { text: 'Nhập mã vận đơn' };
   } else if (payload === 'get_started') {
     response = {
-      text: 'Chào mừng bạn đến với chatbot tracking. Nhập mã tracking để theo dõi đơn hàng.',
+      text: 'Chào mừng bạn đến với chatbot tracking. Nhập một hoặc nhiều mã vận đơn cách nhau bởi dấu phẩy " , ".',
     };
   } else {
     response = {
