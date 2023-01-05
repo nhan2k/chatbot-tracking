@@ -276,58 +276,58 @@ const handleSetupInfor = async (req, res) => {
 };
 app.post('/set', handleSetupInfor);
 
-(function () {
-  let request_body = {
-    get_started: {
-      payload: 'get_started',
-    },
+// (function () {
+//   let request_body = {
+//     get_started: {
+//       payload: 'get_started',
+//     },
 
-    greeting: [
-      {
-        locale: 'default',
-        text: 'Hello {{user_full_name}}!',
-      },
-    ],
+//     greeting: [
+//       {
+//         locale: 'default',
+//         text: 'Hello {{user_full_name}}!',
+//       },
+//     ],
 
-    persistent_menu: [
-      {
-        locale: 'default',
-        composer_input_disabled: false,
-        call_to_actions: [
-          {
-            type: 'postback',
-            title: 'Tracking',
-            payload: 'TRACKING',
-          },
-        ],
-      },
-    ],
-  };
+//     persistent_menu: [
+//       {
+//         locale: 'default',
+//         composer_input_disabled: false,
+//         call_to_actions: [
+//           {
+//             type: 'postback',
+//             title: 'Tracking',
+//             payload: 'TRACKING',
+//           },
+//         ],
+//       },
+//     ],
+//   };
 
-  return new Promise((resolve, reject) => {
-    try {
-      axios({
-        url: `https://graph.facebook.com/v2.6/me/messenger_profile?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
-        method: 'POST',
-        data: request_body,
-      })
-        .then((res) => {
-          console.log(
-            '-----------------------------------------------------------'
-          );
-          console.log('Logs setup button', res.data);
-          console.log(
-            '-----------------------------------------------------------'
-          );
-        })
-        .catch((err) => {
-          console.log(JSON.stringify(err));
-        });
-    } catch (error) {
-      reject(error);
-    }
-  });
-})();
+//   return new Promise((resolve, reject) => {
+//     try {
+//       axios({
+//         url: `https://graph.facebook.com/v2.6/me/messenger_profile?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
+//         method: 'POST',
+//         data: request_body,
+//       })
+//         .then((res) => {
+//           console.log(
+//             '-----------------------------------------------------------'
+//           );
+//           console.log('Logs setup button', res.data);
+//           console.log(
+//             '-----------------------------------------------------------'
+//           );
+//         })
+//         .catch((err) => {
+//           console.log(JSON.stringify(err));
+//         });
+//     } catch (error) {
+//       reject(error);
+//     }
+//   });
+// })();
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
