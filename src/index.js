@@ -70,6 +70,7 @@ app.post('/webhook', async (req, res) => {
   if (body.object === 'page') {
     // Iterates over each entry - there may be multiple if batched
     body.entry.forEach(async function (entry) {
+      console.log('🚀 ~ entry', JSON.stringify(entry, null, 4));
       // Gets the body of the webhook event
       let webhookEvent = entry.messaging[0];
       console.log('webhookEvent', webhookEvent);
@@ -108,10 +109,6 @@ function callSendAPI(senderPsid, response) {
     },
     message: response,
   };
-  console.log(
-    '🚀 ~ file: index.js:111 ~ callSendAPI ~ requestBody',
-    JSON.stringify(requestBody, null, 4)
-  );
 
   // Send the HTTP request to the Messenger Platform
   axios
@@ -205,7 +202,11 @@ function handlePostback(senderPsid, receivedPostback) {
     response = { text: 'Nhập mã Tracking' };
   } else if (payload === 'get_started') {
     response = {
-      text: 'Chào mừng {{user_full_name}} đến với chatbot tracking. Nhập mã tracking để theo dõi đơn hàng.',
+      text: 'Chào mừng bạn đến với chatbot tracking. Nhập mã tracking để theo dõi đơn hàng.',
+    };
+  } else {
+    response = {
+      text: 'Something went wrong!',
     };
   }
   // Send the message to acknowledge the postback
