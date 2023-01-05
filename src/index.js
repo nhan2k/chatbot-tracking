@@ -180,10 +180,14 @@ function handlePostback(senderPsid, receivedPostback) {
     response = { text: 'Thanks!' };
   } else if (payload === 'no') {
     response = { text: 'Oops, try sending another image.' };
-  } else if (payload === 'tracking') {
+  } else if (payload === 'TRACKING') {
     response = { text: 'Nhập mã Tracking' };
   } else if (payload === 'GET_STARTED_PAYLOAD') {
     response = { text: 'Wellcome' };
+  } else if (payload === 'LOCATION_POSTBACK_PAYLOAD') {
+    response = { text: 'Ho Chi Minh City' };
+  } else if (payload === 'HOURS_POSTBACK_PAYLOAD') {
+    response = { text: 'I work 24/24 everyday.' };
   }
   // Send the message to acknowledge the postback
   callSendAPI(senderPsid, response);
