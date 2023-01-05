@@ -98,8 +98,20 @@ app.post('/webhook', (req, res) => {
 
 // Sends response messages via the Send API
 function callSendAPI(senderPsid, response) {
+  console.log(
+    '🚀 ~ file: index.js:101 ~ callSendAPI ~ response',
+    response
+  );
+  console.log(
+    '🚀 ~ file: index.js:101 ~ callSendAPI ~ senderPsid',
+    senderPsid
+  );
   // The page access token we have generated in your app settings
   const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
+  console.log(
+    '🚀 ~ file: index.js:103 ~ callSendAPI ~ PAGE_ACCESS_TOKEN',
+    PAGE_ACCESS_TOKEN
+  );
 
   // Construct the message body
   let requestBody = {
@@ -108,6 +120,10 @@ function callSendAPI(senderPsid, response) {
     },
     message: response,
   };
+  console.log(
+    '🚀 ~ file: index.js:111 ~ callSendAPI ~ requestBody',
+    requestBody
+  );
 
   // Send the HTTP request to the Messenger Platform
   axios
@@ -117,7 +133,7 @@ function callSendAPI(senderPsid, response) {
     )
     .then((res) => console.log('Message sent!', res.data))
     .catch((err) => {
-      console.log('Unable to send message:' + err);
+      console.log('Unable to send message:' + JSON.stringify(err));
     });
 }
 
