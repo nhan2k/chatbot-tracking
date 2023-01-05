@@ -123,10 +123,6 @@ function callSendAPI(senderPsid, response) {
 
 // Handles messages events
 function handleMessage(senderPsid, receivedMessage) {
-  console.log(
-    '🚀 ~ file: index.js:125 ~ handleMessage ~ receivedMessage',
-    JSON.stringify(receivedMessage, null, 4)
-  );
   let response;
 
   // Checks if the message contains text
@@ -193,7 +189,7 @@ function handlePostback(senderPsid, receivedPostback) {
   callSendAPI(senderPsid, response);
 }
 
-const handleSetupInfor = async (req, res) => {
+const handleSetupInfor = async () => {
   let request_body = {
     get_started: {
       payload: 'get_started',
@@ -227,28 +223,24 @@ const handleSetupInfor = async (req, res) => {
         url: `https://graph.facebook.com/v2.6/me/messenger_profile?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
         method: 'POST',
         data: request_body,
-      })
-        .then((res) => {
-          console.log(
-            '-----------------------------------------------------------'
-          );
-          console.log('Logs setup button', res.data);
-          console.log(
-            '-----------------------------------------------------------'
-          );
-          return res.send('Setup done!');
-        })
-        .catch((err) => {
-          console.log(err);
-          return res.send('Something wrongs');
-        });
+      }).then((res) => {
+        console.log(
+          '-----------------------------------------------------------'
+        );
+        console.log('Logs setup button', res.data);
+        console.log(
+          '-----------------------------------------------------------'
+        );
+      });
     } catch (error) {
       reject(error);
     }
   });
 };
 app.post('/set', handleSetupInfor);
-
+handleSetupInfor()
+  .then((res) => console.log(res))
+  .catch((err) => console.log(err));
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
   console.log(
