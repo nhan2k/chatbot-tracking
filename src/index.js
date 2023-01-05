@@ -127,11 +127,26 @@ function handleMessage(senderPsid, receivedMessage) {
 
   // Checks if the message contains text
   if (receivedMessage.text) {
-    // Create the payload for a basic text message, which
-    // will be added to the body of your request to the Send API
-    response = {
-      text: `You sent the message: '${receivedMessage.text}'. Now send me an attachment!`,
-    };
+    axios
+      .get(
+        `https://api.globex.vn/tmm/api/v1/nonAuthen/tracking?keySearch=${receivedMessage.text}&sort=createdAt|desc,statusId|desc`
+      )
+      .then((res) => {
+        if (res.data.isSuccess) {
+          // Create the payload for a basic text message, which
+          // will be added to the body of your request to the Send API
+          response = {
+            text: `Bấm vào link để xem tình trạng đơn hàng ${receivedMessage.text} : https://globex.vn/tra-cuu?trackingNumber=${receivedMessage.text}`,
+          };
+        } else {
+          response = {
+            text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}`,
+          };
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   } else if (receivedMessage.attachments) {
     // Get the URL of the message attachment
     let attachmentUrl = receivedMessage.attachments[0].payload.url;
