@@ -140,17 +140,17 @@ async function handleMessage(senderPsid, receivedMessage) {
         // Create the payload for a basic text message, which
         // will be added to the body of your request to the Send API
         response = {
-          text: `Bấm vào link để xem tình trạng đơn hàng ${receivedMessage.text} : https://globex.vn/tra-cuu?trackingNumber=${receivedMessage.text}`,
+          text: `Bấm vào link để xem tình trạng đơn hàng ${receivedMessage.text} : https://globex.vn/tra-cuu?trackingNumber=${receivedMessage.text}. Nhập mã đơn hàng để xem tình trạng đơn hàng khác.`,
         };
       } else {
         response = {
-          text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}`,
+          text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}. Nhập mã đơn hàng để xem tình trạng đơn hàng khác.`,
         };
       }
     } catch (error) {
       console.log(error);
       response = {
-        text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}`,
+        text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}. Nhập mã đơn hàng để xem tình trạng đơn hàng khác.`,
       };
     }
   } else if (receivedMessage.attachments) {
@@ -203,12 +203,10 @@ function handlePostback(senderPsid, receivedPostback) {
     response = { text: 'Oops, try sending another image.' };
   } else if (payload === 'TRACKING') {
     response = { text: 'Nhập mã Tracking' };
-  } else if (payload === 'GET_STARTED_PAYLOAD') {
-    response = { text: 'Wellcome' };
-  } else if (payload === 'LOCATION_POSTBACK_PAYLOAD') {
-    response = { text: 'Ho Chi Minh City' };
-  } else if (payload === 'HOURS_POSTBACK_PAYLOAD') {
-    response = { text: 'I work 24/24 everyday.' };
+  } else if (payload === 'get_started') {
+    response = {
+      text: 'Chào mừng {{user_full_name}} đến với chatbot tracking. Nhập mã tracking để theo dõi đơn hàng.',
+    };
   }
   // Send the message to acknowledge the postback
   callSendAPI(senderPsid, response);
