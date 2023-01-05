@@ -63,13 +63,13 @@ app.get('/webhook', (req, res) => {
 });
 
 // Creates the endpoint for your webhook
-app.post('/webhook', (req, res) => {
+app.post('/webhook', async (req, res) => {
   let body = req.body;
 
   // Checks if this is an event from a page subscription
   if (body.object === 'page') {
     // Iterates over each entry - there may be multiple if batched
-    body.entry.forEach(function (entry) {
+    body.entry.forEach(async function (entry) {
       // Gets the body of the webhook event
       let webhookEvent = entry.messaging[0];
       console.log('webhookEvent', webhookEvent);
@@ -82,7 +82,7 @@ app.post('/webhook', (req, res) => {
       // pass the event to the appropriate handler function
 
       if (webhookEvent.message) {
-        handleMessage(senderPsid, webhookEvent.message);
+        await handleMessage(senderPsid, webhookEvent.message);
       } else if (webhookEvent.postback) {
         handlePostback(senderPsid, webhookEvent.postback);
       }
@@ -126,39 +126,33 @@ function callSendAPI(senderPsid, response) {
 }
 
 // Handles messages events
-function handleMessage(senderPsid, receivedMessage) {
+async function handleMessage(senderPsid, receivedMessage) {
   let response;
 
   // Checks if the message contains text
   if (receivedMessage.text) {
-    response = axios
-      .get(
+    try {
+      const res = await axios.get(
         `https://api.globex.vn/tmm/api/v1/nonAuthen/tracking?keySearch=${receivedMessage.text}&sort=createdAt|desc,statusId|desc`
-      )
-      .then((res) => {
-        console.log(
-          '🚀 ~ file: index.js:139 ~ .then ~ res',
-          res.data
-        );
-        if (res.data.isSuccess) {
-          // Create the payload for a basic text message, which
-          // will be added to the body of your request to the Send API
-          return {
-            text: `Bấm vào link để xem tình trạng đơn hàng ${receivedMessage.text} : https://globex.vn/tra-cuu?trackingNumber=${receivedMessage.text}`,
-          };
-        } else {
-          return {
-            text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}`,
-          };
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    console.log(
-      '🚀 ~ file: index.js:154 ~ handleMessage ~ response',
-      response
-    );
+      );
+
+      if (res.data.isSuccess) {
+        // Create the payload for a basic text message, which
+        // will be added to the body of your request to the Send API
+        response = {
+          text: `Bấm vào link để xem tình trạng đơn hàng ${receivedMessage.text} : https://globex.vn/tra-cuu?trackingNumber=${receivedMessage.text}`,
+        };
+      } else {
+        response = {
+          text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}`,
+        };
+      }
+    } catch (error) {
+      console.log(error);
+      response = {
+        text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}`,
+      };
+    }
   } else if (receivedMessage.attachments) {
     // Get the URL of the message attachment
     let attachmentUrl = receivedMessage.attachments[0].payload.url;
