@@ -98,20 +98,8 @@ app.post('/webhook', (req, res) => {
 
 // Sends response messages via the Send API
 function callSendAPI(senderPsid, response) {
-  console.log(
-    '🚀 ~ file: index.js:101 ~ callSendAPI ~ response',
-    response
-  );
-  console.log(
-    '🚀 ~ file: index.js:101 ~ callSendAPI ~ senderPsid',
-    senderPsid
-  );
   // The page access token we have generated in your app settings
   const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
-  console.log(
-    '🚀 ~ file: index.js:103 ~ callSendAPI ~ PAGE_ACCESS_TOKEN',
-    PAGE_ACCESS_TOKEN
-  );
 
   // Construct the message body
   let requestBody = {
@@ -120,10 +108,6 @@ function callSendAPI(senderPsid, response) {
     },
     message: response,
   };
-  console.log(
-    '🚀 ~ file: index.js:111 ~ callSendAPI ~ requestBody',
-    requestBody
-  );
 
   // Send the HTTP request to the Messenger Platform
   axios
@@ -133,7 +117,7 @@ function callSendAPI(senderPsid, response) {
     )
     .then((res) => console.log('Message sent!', res.data))
     .catch((err) => {
-      console.log('Unable to send message:' + JSON.stringify(err));
+      console.log('Unable to send message:' + err);
     });
 }
 
@@ -205,7 +189,7 @@ function handlePostback(senderPsid, receivedPostback) {
   callSendAPI(senderPsid, response);
 }
 
-const handleSetupInfor = async () => {
+const handleSetupInfor = async (req, res) => {
   let request_body = {
     get_started: {
       payload: 'get_started',
@@ -239,24 +223,28 @@ const handleSetupInfor = async () => {
         url: `https://graph.facebook.com/v2.6/me/messenger_profile?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
         method: 'POST',
         data: request_body,
-      }).then((res) => {
-        console.log(
-          '-----------------------------------------------------------'
-        );
-        console.log('Logs setup button', res.data);
-        console.log(
-          '-----------------------------------------------------------'
-        );
-      });
+      })
+        .then((res) => {
+          console.log(
+            '-----------------------------------------------------------'
+          );
+          console.log('Logs setup button', res.data);
+          console.log(
+            '-----------------------------------------------------------'
+          );
+          return res.send('Setup done!');
+        })
+        .catch((err) => {
+          console.log(err);
+          return res.send('Something wrongs');
+        });
     } catch (error) {
       reject(error);
     }
   });
 };
 app.post('/set', handleSetupInfor);
-handleSetupInfor()
-  .then((res) => console.log(res))
-  .catch((err) => console.log(err));
+
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
   console.log(
