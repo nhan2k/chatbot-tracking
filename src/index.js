@@ -17,14 +17,14 @@
  * 3. Add your VERIFY_TOKEN and PAGE_ACCESS_TOKEN to your environment vars
  */
 
-'use strict';
+"use strict";
 
 // Use dotenv to read .env vars into Node
-require('dotenv').config();
+require("dotenv").config();
 
 // Imports dependencies and set up http server
-const axios = require('axios'),
-  express = require('express'),
+const axios = require("axios"),
+  express = require("express"),
   app = express();
 
 // Parse application/x-www-form-urlencoded
@@ -34,26 +34,26 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Respond with 'Hello World' when a GET request is made to the homepage
-app.get('/', function (_req, res) {
-  res.send('Hello World');
+app.get("/", function (_req, res) {
+  res.send("Hello World");
 });
 
 // Adds support for GET requests to our webhook
-app.get('/webhook', (req, res) => {
+app.get("/webhook", (req, res) => {
   // Your verify token. Should be a random string.
   const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 
   // Parse the query params
-  let mode = req.query['hub.mode'];
-  let token = req.query['hub.verify_token'];
-  let challenge = req.query['hub.challenge'];
+  let mode = req.query["hub.mode"];
+  let token = req.query["hub.verify_token"];
+  let challenge = req.query["hub.challenge"];
 
   // Checks if a token and mode is in the query string of the request
   if (mode && token) {
     // Checks the mode and token sent is correct
-    if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+    if (mode === "subscribe" && token === VERIFY_TOKEN) {
       // Responds with the challenge token from the request
-      console.log('WEBHOOK_VERIFIED');
+      console.log("WEBHOOK_VERIFIED");
       res.status(200).send(challenge);
     } else {
       // Responds with '403 Forbidden' if verify tokens do not match
@@ -63,21 +63,21 @@ app.get('/webhook', (req, res) => {
 });
 
 // Creates the endpoint for your webhook
-app.post('/webhook', async (req, res) => {
+app.post("/webhook", async (req, res) => {
   let body = req.body;
 
   // Checks if this is an event from a page subscription
-  if (body.object === 'page') {
+  if (body.object === "page") {
     // Iterates over each entry - there may be multiple if batched
     body.entry.forEach(async function (entry) {
-      console.log('🚀 ~ entry', JSON.stringify(entry, null, 4));
+      console.log("🚀 ~ entry", JSON.stringify(entry, null, 4));
       // Gets the body of the webhook event
       let webhookEvent = entry.messaging[0];
-      console.log('webhookEvent', webhookEvent);
+      console.log("webhookEvent", webhookEvent);
 
       // Get the sender PSID
       let senderPsid = webhookEvent.sender.id;
-      console.log('Sender PSID: ' + senderPsid);
+      console.log("Sender PSID: " + senderPsid);
 
       // Check if the event is a message or postback and
       // pass the event to the appropriate handler function
@@ -90,7 +90,7 @@ app.post('/webhook', async (req, res) => {
     });
 
     // Returns a '200 OK' response to all requests
-    res.status(200).send('EVENT_RECEIVED');
+    res.status(200).send("EVENT_RECEIVED");
   } else {
     // Returns a '404 Not Found' if event is not from a page subscription
     res.sendStatus(404);
@@ -116,9 +116,9 @@ function callSendAPI(senderPsid, response) {
       `https://graph.facebook.com/v15.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`,
       requestBody
     )
-    .then((res) => console.log('Message sent!', res.data))
+    .then((res) => console.log("Message sent!", res.data))
     .catch((err) => {
-      console.log('Unable to send message:' + err);
+      console.log("Unable to send message:" + err);
     });
 }
 
@@ -127,27 +127,28 @@ async function handleMessage(senderPsid, receivedMessage) {
   let response;
 
   // Checks if the message contains text
-  if (receivedMessage.text) {
+  if (receivedMessage.text.include("/t")) {
     try {
+      const orderIds = receivedMessage.text.split(" ")[1];
       const res = await axios.get(
-        `https://api.globex.vn/tmm/api/v1/nonAuthen/tracking?keySearch=${receivedMessage.text}&sort=createdAt|desc,statusId|desc`
+        `https://api.globex.vn/tmm/api/v1/nonAuthen/tracking?keySearch=${orderIds}&sort=createdAt|desc,statusId|desc`
       );
 
       if (res.data.isSuccess) {
         // Create the payload for a basic text message, which
         // will be added to the body of your request to the Send API
         response = {
-          text: `Bấm vào link để xem tình trạng đơn hàng ${receivedMessage.text} : https://globex.vn/tra-cuu?trackingNumber=${receivedMessage.text}. Nhập mã đơn hàng để xem tình trạng đơn hàng khác.`,
+          text: `Bấm vào link để xem tình trạng đơn hàng ${orderIds} : https://globex.vn/tra-cuu?trackingNumber=${orderIds}. Nhập mã đơn hàng để xem tình trạng đơn hàng khác.`,
         };
       } else {
         response = {
-          text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}. Nhập mã vận đơn để xem tình trạng đơn hàng khác.`,
+          text: `Không tìm thấy tình trạng đơn hàng ${orderIds}. Nhập mã vận đơn để xem tình trạng đơn hàng khác.`,
         };
       }
     } catch (error) {
       console.log(error);
       response = {
-        text: `Không tìm thấy tình trạng đơn hàng ${receivedMessage.text}. Nhập mã vận đơn để xem tình trạng đơn hàng khác.`,
+        text: `Không tìm thấy tình trạng đơn hàng ${orderIds}. Nhập mã vận đơn để xem tình trạng đơn hàng khác.`,
       };
     }
   } else if (receivedMessage.attachments) {
@@ -155,24 +156,24 @@ async function handleMessage(senderPsid, receivedMessage) {
     let attachmentUrl = receivedMessage.attachments[0].payload.url;
     response = {
       attachment: {
-        type: 'template',
+        type: "template",
         payload: {
-          template_type: 'generic',
+          template_type: "generic",
           elements: [
             {
-              title: 'Is this the right picture?',
-              subtitle: 'Tap a button to answer.',
+              title: "Is this the right picture?",
+              subtitle: "Tap a button to answer.",
               image_url: attachmentUrl,
               buttons: [
                 {
-                  type: 'postback',
-                  title: 'Yes!',
-                  payload: 'yes',
+                  type: "postback",
+                  title: "Yes!",
+                  payload: "yes",
                 },
                 {
-                  type: 'postback',
-                  title: 'No!',
-                  payload: 'no',
+                  type: "postback",
+                  title: "No!",
+                  payload: "no",
                 },
               ],
             },
@@ -180,6 +181,17 @@ async function handleMessage(senderPsid, receivedMessage) {
         },
       },
     };
+  } else {
+    try {
+      response = {
+        text: `Cú pháp không hợp lệ`,
+      };
+    } catch (error) {
+      console.log(error);
+      response = {
+        text: `Cú pháp không hợp lệ`,
+      };
+    }
   }
 
   // Send the response message
@@ -194,19 +206,21 @@ function handlePostback(senderPsid, receivedPostback) {
   let payload = receivedPostback.payload;
 
   // Set the response based on the postback payload
-  if (payload === 'yes') {
-    response = { text: 'Thanks!' };
-  } else if (payload === 'no') {
-    response = { text: 'Oops, try sending another image.' };
-  } else if (payload === 'TRACKING') {
-    response = { text: 'Nhập mã vận đơn' };
-  } else if (payload === 'get_started') {
+  if (payload === "yes") {
+    response = { text: "Thanks!" };
+  } else if (payload === "no") {
+    response = { text: "Oops, try sending another image." };
+  } else if (payload === "TRACKING") {
     response = {
-      text: 'Chào mừng bạn đến với chatbot tracking. Nhập một hoặc nhiều mã vận đơn cách nhau bởi dấu phẩy " , ".',
+      text: "Nhập mã vận đơn với cú pháp : /t (mã vận đơn) hoặc tìm nhiều mã vận đơn : /t (mã vận đơn 1,mã vận đơn 2,...)",
+    };
+  } else if (payload === "get_started") {
+    response = {
+      text: "Nhập mã vận đơn với cú pháp : /t (mã vận đơn) hoặc tìm nhiều mã vận đơn : /t (mã vận đơn 1,mã vận đơn 2,...)",
     };
   } else {
     response = {
-      text: 'Something went wrong!',
+      text: "Cú pháp không hợp lệ, nhập mã vận đơn với cú pháp : /t (mã vận đơn) hoặc tìm nhiều mã vận đơn : /t (mã vận đơn 1,mã vận đơn 2,...)",
     };
   }
   // Send the message to acknowledge the postback
@@ -216,25 +230,25 @@ function handlePostback(senderPsid, receivedPostback) {
 const handleSetupInfor = async (req, res) => {
   let request_body = {
     get_started: {
-      payload: 'get_started',
+      payload: "get_started",
     },
 
     greeting: [
       {
-        locale: 'default',
-        text: 'Hello {{user_full_name}}!',
+        locale: "default",
+        text: "Hello {{user_full_name}}!",
       },
     ],
 
     persistent_menu: [
       {
-        locale: 'default',
+        locale: "default",
         composer_input_disabled: false,
         call_to_actions: [
           {
-            type: 'postback',
-            title: 'Tracking',
-            payload: 'TRACKING',
+            type: "postback",
+            title: "Tracking",
+            payload: "TRACKING",
           },
         ],
       },
@@ -245,29 +259,29 @@ const handleSetupInfor = async (req, res) => {
     try {
       axios({
         url: `https://graph.facebook.com/v2.6/me/messenger_profile?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
-        method: 'POST',
+        method: "POST",
         data: request_body,
       })
         .then((res) => {
           console.log(
-            '-----------------------------------------------------------'
+            "-----------------------------------------------------------"
           );
-          console.log('Logs setup button', res.data);
+          console.log("Logs setup button", res.data);
           console.log(
-            '-----------------------------------------------------------'
+            "-----------------------------------------------------------"
           );
-          return res.send('Setup done!');
+          return res.send("Setup done!");
         })
         .catch((err) => {
           console.log(err);
-          return res.send('Something wrongs');
+          return res.send("Something wrongs");
         });
     } catch (error) {
       reject(error);
     }
   });
 };
-app.post('/set', handleSetupInfor);
+app.post("/set", handleSetupInfor);
 
 // (function () {
 //   let request_body = {
@@ -324,7 +338,5 @@ app.post('/set', handleSetupInfor);
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
-  console.log(
-    'Your app is listening on port ' + listener.address().port
-  );
+  console.log("Your app is listening on port " + listener.address().port);
 });
