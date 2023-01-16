@@ -184,12 +184,12 @@ async function handleMessage(senderPsid, receivedMessage) {
   } else {
     try {
       response = {
-        text: `Cú pháp không hợp lệ`,
+        text: `Cú pháp không hợp lệ, nhập mã vận đơn với cú pháp : /t (mã vận đơn) hoặc tìm nhiều mã vận đơn : /t (mã vận đơn 1,mã vận đơn 2,...)`,
       };
     } catch (error) {
       console.log(error);
       response = {
-        text: `Cú pháp không hợp lệ`,
+        text: `Cú pháp không hợp lệ, nhập mã vận đơn với cú pháp : /t (mã vận đơn) hoặc tìm nhiều mã vận đơn : /t (mã vận đơn 1,mã vận đơn 2,...)`,
       };
     }
   }
