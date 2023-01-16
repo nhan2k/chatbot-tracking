@@ -127,7 +127,7 @@ async function handleMessage(senderPsid, receivedMessage) {
   let response;
 
   // Checks if the message contains text
-  if (receivedMessage.text.include("/t")) {
+  if (receivedMessage.text.includes("/t")) {
     try {
       const orderIds = receivedMessage.text.split(" ")[1];
       const res = await axios.get(
